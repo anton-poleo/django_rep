@@ -1,0 +1,23 @@
+{% load staticfiles %}
+<head>
+    <link rel="stylesheet" media="all" href="{% static 'css/styles.css' %}" type="text/css">
+</head>
+{% for e in form.non_field_error %}
+    <div class="alert alert_danger">{{ e }}</div>
+{% endfor %}
+
+<form class="form-NNN" method="post" action="/registration/trader">
+    <fieldset>
+        {% for field in form %}
+        <div class="group_NNN
+            {% if field.errors %}has-errors{% endif %}">
+            <label class="label_NNN">{{ field.label }}</label>
+            <div class="div_NNN">{{ field }}</div>
+        </div>
+        {% endfor %}
+    </fieldset>
+    <div class="form-btn">
+        <input class="btn_style btn_size2" type="submit" onclick="location.href='verification.html'" value="Зарегистрироваться">
+    </div>
+</form>
+

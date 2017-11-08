@@ -1,0 +1,168 @@
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{{ seo.title|default:'Safinus - Revolutionary Platform for Investments in Cryptocurrencies and ICOs' }}</title>
+        <meta name="description" content="{{ seo.description|default:'A platform, where new entrants to the crypto market can join profitable cryptocurrency and ICO portfolios in just a few clicks. Additionally, experienced investors can significantly increase the volume of their managed capital, while professional traders and funds can attract new clients on a global scale.' }}" />
+        <link href="{% static 'pages/img/favicon.png' %}" rel="shortcut" type="image/x-icon" />
+        <link href="{% static 'pages/img/favicon.png' %}" rel="icon" type="image/x-icon" />
+
+        <link rel="stylesheet/less" type="text/css" href="{% static 'pages/less/main.less' %}" />
+        <script src="{% static 'pages/scripts/less.min.js' %}"></script>
+        {# <link rel="stylesheet" href="{% static 'pages/css/main.css' %}"> #}
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <!-- Global Site Tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-107715329-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-107715329-1');
+        </script>
+        <!-- Facebook Pixel Code -->
+        <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+         fbq('init', '1869840929697829');
+        fbq('track', 'PageView');
+        </script>
+        <noscript>
+         <img height="1" width="1"
+        src="https://www.facebook.com/tr?id=1869840929697829&ev=PageView
+        &noscript=1"/>
+        </noscript>
+        <!-- End Facebook Pixel Code -->
+    </head>
+
+    <body>
+        <div class="wrapper">
+            <div class="header">
+                <div class="container clearfix"><a class="logo" href="{% url 'pages:index' %}"><img src="{% static 'pages/img/logo.png' %}" alt=""></a>
+                    <ul class="menu">
+                        <li class="only-mob"><a class="menu_close">✕</a></li>
+                        <li><a href="{% url 'pages:index' %}">ICO</a></li>
+                        <li><a href="{% url 'pages:mvp' %}">{% trans 'Prototype' %}</a></li>
+                        <li><a href="{% url 'pages:whitepaper' %}">{% trans 'White paper' %}</a></li>
+                        {# <li><a href="{% url 'blog:index' %}">{% trans 'Blog' %}</a></li> #}
+                        {# <li><a href="#">{% trans 'Portfolio rating' %}</a></li> #}
+                        {# <li><a href="#">{% trans 'Exchange' %}</a></li> #}
+                    </ul>
+                    <div class="pull-right">
+                        <div class="inline-block align-middle header-social"><span class="align-middle">{% trans 'Our chats' %}:</span>
+                            <div class="social">
+                                <a class="item-soc" href="https://safinum.herokuapp.com/" target="_blank"><img src="{% static 'pages/img/soc-icon_1.png' %}" alt=""></a>
+                                <a class="item-soc" href="https://t.me/safinum" target="_blank"><img src="{% static 'pages/img/soc-icon_2.png' %}" alt=""></a></div>
+                        </div>
+                        <div class="inline-block align-middle lang-container"><a class="lang-btn" href="#">{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE|title }}</a>
+                            <ul class="lang-list">
+                                {% get_available_languages as languages %}
+                                {% for lang_code, lang_name in languages %}
+                                    {% language lang_code %}
+                                        {% get_language_info for lang_code as lang %}
+                                        <li class="{{lang_code}}"><a href="{% url 'pages:index' %}"><img src="{% static 'pages/img/' %}flag_{{lang_code}}.png" alt=""><span>{{ lang.name_local }}</span></a></li>
+                                    {% endlanguage %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {#<a class="btn_style only-pc-tab" href="#">{% trans 'Sign in' %}</a>#}
+                        <a class="nav-icon btn-mob-nav"><span></span><span></span><span></span><span></span></a>
+                    </div>
+                </div>
+            </div>
+            <!-- .header-->
+            {% endblock %}
+
+            {% block content %}
+            {% endblock %}
+
+            {% block footer %}
+        </div>
+        <div class="footer">
+            <div class="container clearfix">
+                <div class="copyright only-pc-tab">© 2017 - Safinus.com</div>
+                <div class="footer-menu">
+                    <ul>
+                        <li><a href="{% url 'pages:index' %}">ICO</a></li>
+                        <li><a href="{% url 'pages:mvp' %}">{% trans 'Prototype' %}</a></li>
+                        <li><a href="{% url 'pages:whitepaper' %}">{% trans 'White paper' %}</a></li>
+                        {# <li><a href="{% url 'blog:index' %}">{% trans 'Blog' %}</a></li> #}
+                        <li class="small_text">{% trans 'ICO Marketing & Development Services Provided by ' %} <a href="http://www.icoproducer.com/" target="_blank">ICO Producer</a></li>
+                        {#<li><a href="#">{% trans 'Exchange' %}</a></li>#}
+                    </ul>
+                    {% comment %}
+                    <ul>
+                        <li><a href="#">{% trans 'ICO-tracker' %}</a></li>
+                        <li><a href="#">{% trans 'Portfolio rating' %}</a></li>
+                    </ul>
+                    <ul class="size_set">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">{% trans 'Blog' %}</a></li>
+                        <li><a href="#">{% trans 'Contact us' %}</a></li>
+                    </ul>
+                    {% endcomment %}
+                </div>
+                <div class="pull-right">
+                    <div class="title_soc">{% trans 'Follow us' %}:</div>
+                    <div class="social">
+                        <a class="item-soc" href="https://safinum.herokuapp.com/" target="_blank"><img src="{% static 'pages/img/soc-icon_1.png' %}" alt=""></a>
+                        <a class="item-soc" href="https://t.me/safinum" target="_blank"><img src="{% static 'pages/img/soc-icon_2.png' %}" alt=""></a>
+                        <a class="item-soc" href="https://twitter.com/safinum" target="_blank"><img src="{% static 'pages/img/soc-icon_3.png' %}" alt=""></a>
+                        <a class="item-soc" href="https://www.facebook.com/pg/SafinumPlatform" target="_blank"><img src="{% static 'pages/img/soc-icon_4.png' %}" alt=""></a>
+                        {#<a class="item-soc" href="#" target="_blank"><img src="{% static 'pages/img/soc-icon_5.png' %}" alt=""></a> <a class="item-soc" href="#" target="_blank"><img src="{% static 'pages/img/soc-icon_6.png' %}" alt=""></a> #}
+                        <a class="item-soc" href="https://medium.com/@safinum" target="_blank"><img src="{% static 'pages/img/soc-icon_7.png' %}" alt=""></a>
+                    </div>
+                </div>
+                <div class="copyright only-mob">© 2017 -  Safinus.com</div>
+            </div>
+        </div>
+        <!-- .footer-->
+        <!-- Scripts-->
+        <script src="{% static 'pages/scripts/wow.min.js' %}"></script>
+        <script src="{% static 'pages/scripts/jquery.fancybox.pack.js' %}"></script>
+        {# <script src="{% static 'pages/scripts/all.js' %}"></script> #}
+        <script src="{% static 'pages/scripts/jquery.plugin.min.js' %}"></script>
+        <script src="{% static 'pages/scripts/jquery.countdown.min.js' %}"></script>
+        <script src="{% static 'pages/scripts/scripts.js' %}"></script>
+        {% comment %}
+            <script type="text/javascript">
+                $('body').css('position','relative');
+                $('body').append('<img id="overlay" style="opacity: 0.5;left: 0;top: -3px;z-index: 1000;position: absolute; display: none;" src="/template.jpg" />');
+                var isCtrl = false;
+                $(document).keyup(function (e) {
+                    if(e.which == 17)
+                        isCtrl=false;
+                }).keydown(function (e) {
+                    if(e.which == 17)
+                        isCtrl=true;
+                    if(e.which == 81 && isCtrl == true)
+                    {
+                        if ($('#overlay').css('display') == 'none')
+                        {
+                            $('#overlay').show();
+                        }
+                        else
+                        {
+                            $('#overlay').hide();
+                        }
+                        return false;
+                    }
+                });
+            </script>
+        {% endcomment %}
+
+    </body>
+</html>
+{% endblock %}
