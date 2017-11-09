@@ -4,28 +4,12 @@ from django.db import models
 from django.core.validators import RegexValidator
 # Create your models here.
 # Убрать все валидаторы. Проверки во вьюшке
-'''
-    name
-    surname
-    born_date
-    country
-    mail_code
-    address
-    phone_number
-    email
-    password
-    logo
-    link_facebook
-    link_linkedIn
-    invest_time
-    investments
-    add_info
-'''
+
 
 class Trader(models.Model):
     name = models.CharField(max_length=100)
     surname = models.CharField(max_length=100)
-    born_date = models.DateField()
+    birthday = models.DateField()
     country = models.CharField(max_length=100)
     # аргументы??
     mail_code = models.CharField(max_length=100)
@@ -43,15 +27,14 @@ class Trader(models.Model):
     link_facebook = models.CharField(max_length=100)
     link_linkedIn = models.CharField(max_length=100)
     # инвестиции в активы. гг:мм
-    invest_regex = RegexValidator(regex=r'([0-30]{0,1})*:([0-11]{0,1})',
-                                  message="invalid date")
+    # invest_regex = RegexValidator(regex=r'([0-30]{0,1})*:([0-11]{0,1})',
+    #                              message="invalid date")
     # validators=invest_regex
     invest_time = models.CharField(max_length=100)
-    investments = models.BooleanField(default=False)
-    add_info = models.CharField(max_length=100)
+    investments = models.CharField(max_length=10)
+    add_info = models.CharField(max_length=2000)
 
     class Meta:
-
         db_table = "trader"
 
 

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+import json
 from models import Trader, Fund
 from django import forms
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
 from django.template import loader
-from django.shortcuts import render
+from django.core.validators import ValidationError
+from django.shortcuts import render_to_response, render
+from django.http import JsonResponse
 # Функция принимает form_id и вызвывает нужную регистрацию. Или здесь считывать id, тогда объединить формы.
 # Класс формы все поля по html. Заполняем, валидируем, что ужно конкатенируем и отправляем в model.create
 # Create your views here.
@@ -15,9 +17,76 @@ from django.shortcuts import render
 def registration(request):
     if request.method == "POST":
         if request.POST['form_id'] == 'trader':
-            return register_trader(request)
+            form = RegistrationFormTrader(request.POST)
+            if form.is_valid():
+                trader = Trader.objects.create(
+                    name=form.cleaned_data.get('name'),
+                    surname=form.cleaned_data.get('surname'),
+                    birthday=form.cleaned_data.get('birthday'),
+                    country=form.cleaned_data.get('country'),
+                    mail_code=form.cleaned_data.get('mail_code'),
+                    address=form.cleaned_data.get('address'),
+                    phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
+                        'second_part_phone_number'),
+                    email=form.cleaned_data.get('email'),
+                    password=form.cleaned_data.get('password'),
+                    # password_repeat=form.cleaned_data.get('password_repeat'),
+                    logo=form.cleaned_data.get('logo'),
+                    link_facebook=form.cleaned_data.get('link_facebook'),
+                    link_linkedIn=form.cleaned_data.get('link_linkedIn'),
+                    invest_time=form.cleaned_data.get('invest_year') + ":" + form.cleaned_data.get('invest_month'),
+                    investments=form.cleaned_data.get('radio_name1'),
+                    add_info=form.cleaned_data.get('add_info')
+                )
+                trader.save()
+                # редиректим на проверку номера, а затем в личный кабинет
+                return HttpResponse("eee")
+            else:
+                return HttpResponse(
+                    json.dumps({"nothing to see": "this isn't happening"}),
+                    content_type="application/json"
+                )
+
+                # Возвращаем объект json
+                # raise ValidationError('invalid field', code='invalid')
+                # return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
         else:
-            return register_fund(request)
+            form = RegistrationFormFund(request.POST)
+            if form.is_valid():
+                fund = Fund.objects.create(
+                    name_fund=form.cleaned_data.get('name_fund'),
+                    country=form.cleaned_data.get('country'),
+                    mail_code=form.cleaned_data.get('mail_code'),
+                    address=form.cleaned_data.get('address'),
+                    name_leader=form.cleaned_data.get('name_leader'),
+                    surname_leader=form.cleaned_data.get('surname_leader'),
+                    birthday=form.cleaned_data.get('birthday'),
+                    phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
+                        'second_part_phone_number'),
+                    email=form.cleaned_data.get('email'),
+                    password=form.cleaned_data.get('password'),
+                    # password_repeat=form.cleaned_data('password_repeat'),
+                    logo=form.cleaned_data.get('logo'),
+                    age_of_fund=form.cleaned_data.get('age_of_fund_year') + form.cleaned_data.get('age_of_fund_month'),
+                    img_leader=form.cleaned_data.get('img_leader'),
+                    link_facebook=form.cleaned_data.get('link_facebook'),
+                    link_linkedIn=form.cleaned_data.get('link_linkedIn'),
+                    add_info_fund=form.cleaned_data.get('add_info_fund'),
+                    add_info_leader=form.cleaned_data.get('add_info_leader')
+                )
+                fund.save()
+                # редиректим на проверку номера, от туда в личный кабинет
+                return HttpResponse("eee")
+            else:
+                return HttpResponse(
+                    json.dumps({"nothing to see": "this isn't happening"}),
+                    content_type="application/json"
+                )
+
+                # Возвращаем ошиб
+                #return HttpResponse(form.errors.as_json())
+    else:
+        return render(request, 'registration/registration.html')
 
 
 def index(request):
@@ -26,14 +95,18 @@ def index(request):
 
 def reg_test(request):
     if request.method == "POST":
-        form = RegistrationFormTrader(request.POST)
+        form = RegistrationFormFund(request.POST)
         if form.is_valid():
-            return HttpResponse(form)
+            type_of = type(form['age_of_fund_year'])
+            f = {'a': type_of, 'b': '2'}
+            return HttpResponse(type_of)
         else:
-            a = request.POST.get('second_part_phone_number')
-            return HttpResponse(form.errors)
+            # a = form['add_info']
+            b = form['second_part_phone_number']
+            c = form.errors.as_json()
+            return HttpResponse(c)
     else:
-        form = RegistrationFormTrader()
+        form = RegistrationFormFund()
         return render(request, 'registration/registration.html', {'form': form})
 
 
@@ -41,30 +114,31 @@ def register_trader(request):
     if request.method == "POST":
         form = RegistrationFormTrader(request.POST)
         if form.is_valid():
-            trader = Trader.object.create(
-                name=form.cleaned_data('name'),
-                surname=form.cleaned_data('surname'),
-                birthday=form.cleaned_data('birthday'),
-                country=form.cleaned_data('country'),
-                mail_code=form.cleaned_data('mail_code'),
-                address=form.cleaned_data('address'),
-                phone_number=form.cleaned_data('first_part_phone_number') + form.cleaned_data('second_part_phone_number'),
-                email=form.cleaned_data('email'),
-                password=form.cleaned_data('password'),
-                password_repeat=form.cleaned_data('password_repeat'),
-                logo=form.cleaned_data('logo'),
-                link_facebook=form.cleaned_data('link_facebook'),
-                link_linkedIn=form.cleaned_data('link_linkedIn'),
-                invest_time=form.cleaned_data('invest_year')+form.cleaned_data('invest_month'),
-                investments=True,
-                add_info=form.cleaned_data('add_info')
+            trader = Trader.objects.create(
+                name=form.cleaned_data.get('name'),
+                surname=form.cleaned_data.get('surname'),
+                birthday=form.cleaned_data.get('birthday'),
+                country=form.cleaned_data.get('country'),
+                mail_code=form.cleaned_data.get('mail_code'),
+                address=form.cleaned_data.get('address'),
+                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get('second_part_phone_number'),
+                email=form.cleaned_data.get('email'),
+                password=form.cleaned_data.get('password'),
+                # password_repeat=form.cleaned_data.get('password_repeat'),
+                logo=form.cleaned_data.get('logo'),
+                link_facebook=form.cleaned_data.get('link_facebook'),
+                link_linkedIn=form.cleaned_data.get('link_linkedIn'),
+                invest_time=form.cleaned_data.get('invest_year') + ":" + form.cleaned_data.get('invest_month'),
+                radio_name1=form.cleaned_data.get('radio_name1'),
+                add_info=form.cleaned_data.get('add_info')
             )
             trader.save()
-
-            return render(request, '/registration/verification.html', {'form': form})
+            # редиректим на проверку номера, а затем в личный кабинет
+            return HttpResponse("eee")
         else:
             # Возвращаем объект json
-            return render(request, '/registration/registration.html', {'form': form})
+            # raise ValidationError('invalid field', code='invalid')
+            return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
     else:
         form = RegistrationFormTrader()
         return render(request, 'registration/registration.html', {'form': form})
@@ -75,37 +149,35 @@ def register_fund(request):
     if request.method == "POST":
         form = RegistrationFormFund(request.POST)
         if form.is_valid():
-            fund = Fund.object.create(
-                name_fund=form.cleaned_data('name_fund'),
-                country=form.cleaned_data('country'),
-                mail_code=form.cleaned_data('mail_code'),
-                address=form.cleaned_data('address'),
-                name_leader=form.cleaned_data('name'),
-                surname_leader=form.cleaned_data('surname'),
-                birthday=form.cleaned_data('birthday'),
-                phone_number=form.cleaned_data('phone_number'),
-                email=form.cleaned_data('email'),
-                password=form.cleaned_data('password'),
-                password_repeat=form.cleaned_data('password_repeat'),
-                logo=form.cleaned_data('logo'),
-                age_of_fund=form.cleaned_data('age_of_fund'),
-                img_leader=form.cleaned_data('img_leader'),
-                link_facebook=form.cleaned_data('link_facebook'),
-                link_linkedIn=form.cleaned_data('link_linkedIn'),
-                invest_time=form.cleaned_data('invest_time'),
-                investments=form.cleaned_data('investments'),
-                add_info_fund=form.cleaned_data('add_info_fund'),
-                add_info_leader=form.cleaned_data('add_info_leader')
+            fund = Fund.objects.create(
+                name_fund=form.cleaned_data.get('name_fund'),
+                country=form.cleaned_data.get('country'),
+                mail_code=form.cleaned_data.get('mail_code'),
+                address=form.cleaned_data.get('address'),
+                name_leader=form.cleaned_data.get('name_leader'),
+                surname_leader=form.cleaned_data.get('surname_leader'),
+                birthday=form.cleaned_data.get('birthday'),
+                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get('second_part_phone_number'),
+                email=form.cleaned_data.get('email'),
+                password=form.cleaned_data.get('password'),
+                # password_repeat=form.cleaned_data('password_repeat'),
+                logo=form.cleaned_data.get('logo'),
+                age_of_fund=form.cleaned_data.get('age_of_fund_year') + form.cleaned_data.get('age_of_fund_month'),
+                img_leader=form.cleaned_data.get('img_leader'),
+                link_facebook=form.cleaned_data.get('link_facebook'),
+                link_linkedIn=form.cleaned_data.get('link_linkedIn'),
+                add_info_fund=form.cleaned_data.get('add_info_fund'),
+                add_info_leader=form.cleaned_data.get('add_info_leader')
             )
             fund.save()
             # редиректим на проверку номера, от туда в личный кабинет
-            return 1
+            return HttpResponse("eee")
         else:
-            # Возвращаем ошибку. json???
-            return 1
+            # Возвращаем ошиб
+            return HttpResponse(form.errors.as_json())
     else:
         form = RegistrationFormTrader()
-        return render(request, 'registration/index.html', {'form': form})
+        return render(request, 'registration/registration.html', {'form': form})
 
 
 class RegistrationFormTrader(forms.Form):
@@ -134,8 +206,10 @@ class RegistrationFormTrader(forms.Form):
                         'max_length': 'max length = 50 characters'}
     )
     # Сколько может быть цифр максимально в почтовом коде?
-    validator_mail_code = RegexValidator(regex=r'^[0-9]{5-20}',
-                                         message='invalid mail code')
+    validator_mail_code = RegexValidator(regex=r'^\d{5,20}$',
+                                         message='invalid mail code',
+                                         # inverse_match=True
+                                         )
     mail_code = forms.CharField(
         validators=[validator_mail_code],
         required=True,
@@ -148,14 +222,16 @@ class RegistrationFormTrader(forms.Form):
         error_messages={'required': 'Please enter your country',
                         'max_length': 'max length = 150 characters'}
     )
-    phone_regex = RegexValidator(regex=r'^\d{10}$',
-                                 message="Phone number must be entered in the format:")
+
     first_part_phone_number = forms.CharField(
         # validators=[phone_regex],
         required=True,
         error_messages={'required': 'Please enter your phone'}
     )
-    second_part_number_phone = forms.CharField(
+    phone_regex = RegexValidator(regex=r'^\d{10}$',
+                                 message="Phone number must be entered in the format:"
+                                 )
+    second_part_phone_number = forms.CharField(
         validators=[phone_regex],
         required=True,
         error_messages={'required': 'Please enter your phone'}
@@ -166,32 +242,44 @@ class RegistrationFormTrader(forms.Form):
     )
     # validator_password = RegexValidator(regex=r'')
     password = forms.CharField(
+        min_length=6,
+        max_length=100,
         required=True,
-        error_messages={'required': 'Please enter your phone'}
+        error_messages={'required': 'Please enter your passwd'}
         # Валидатор на условия
         # Узнать как хешировать и солировать пароль
     )
     password_repeat = forms.CharField(
         required=True,
-        error_messages={'required': 'Please enter your phone'}
+        error_messages={'required': 'Please enter your passwd'}
     )
-    # logo = forms.ImageField(
+    logo = forms.ImageField(
         # links
-    # )
+        required=False
+    )
     link_facebook = forms.CharField(
+        empty_value=None,
         required=False,
     )
     link_linkedIn = forms.CharField(
+        empty_value=None,
         required=False,
     )
-    invest_time = forms.CharField(
-    #     validator
-    )
-    investments = forms.BooleanField(
-        required=False
 
+    invest_year = forms.CharField(
+        max_length=2,
+    )
+    # invest_month_validator = RegexValidator(regex=r'')
+    invest_month = forms.CharField(
+        max_length=2,
+    )
+
+    radio_name1 = forms.CharField(
+        max_length=100,
+        required=False
     )
     add_info = forms.CharField(
+        empty_value=None,
         required=False,
         max_length=2000,
         error_messages={'max_length': 'max length 2000 characters',
@@ -220,7 +308,7 @@ class RegistrationFormFund(forms.Form):
         error_messages={'required': 'Please enter your country',
                         'max_length': 'max length = 50 characters'}
     )
-    validator_mail_code = RegexValidator(regex=r'\d{10-20}', message='invalid mail code')
+    validator_mail_code = RegexValidator(regex=r'\d{5,20}', message='invalid mail code')
     mail_code = forms.CharField(
         validators=[validator_mail_code],
         required=True,
@@ -249,37 +337,53 @@ class RegistrationFormFund(forms.Form):
         error_messages={'required': 'Please enter your birthday',
                         'invalid': '%Y-%m-%d, %m/%d/%Y, %m/%d/%y'}
     )
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
+    first_part_phone_number = forms.CharField(
+        required=True,
+        max_length=3
+    )
+    phone_regex = RegexValidator(regex=r'^\d{10}$',
                                  message="Phone number must be entered in the format:"
                                          " '+999999999'. Up to 15 digits allowed.")
-    phone_number = forms.CharField(
-
+    second_part_phone_number = forms.CharField(
+        required=True,
+        validators=[phone_regex],
+        max_length=10
     )
     email = forms.EmailField(
         required=True,
         error_messages={'required': 'Please enter your email'}
     )
     password = forms.CharField(
-
+        required=True,
+        max_length=100,
+        min_length=6
     )
     password_repeat = forms.CharField(
-
+        required=True,
+        max_length=100,
+        min_length=6
     )
     logo = forms.ImageField(
-
+        required=False
     )
-    age_of_fund = forms.CharField(
-
+    age_of_fund_year = forms.CharField(
+        required=True,
+        max_length=3
+    )
+    age_of_fund_month = forms.CharField(
+        required=True,
+        max_length=3
     )
     img_leader = forms.ImageField(
-
+        required=False
     )
     link_facebook = forms.CharField(
         required=False,
-
+        max_length=100
     )
     link_linkedIn = forms.CharField(
-        required=False
+        required=False,
+        max_length=100
     )
     add_info_fund = forms.CharField(
         max_length=2000,
