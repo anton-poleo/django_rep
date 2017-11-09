@@ -42,10 +42,7 @@ def registration(request):
                 # редиректим на проверку номера, а затем в личный кабинет
                 return HttpResponse("eee")
             else:
-                return HttpResponse(
-                    json.dumps({"nothing to see": "this isn't happening"}),
-                    content_type="application/json"
-                )
+                return JsonResponse({"status": False, "message": {"error": form.errors}})
 
                 # Возвращаем объект json
                 # raise ValidationError('invalid field', code='invalid')
@@ -78,11 +75,7 @@ def registration(request):
                 # редиректим на проверку номера, от туда в личный кабинет
                 return HttpResponse("eee")
             else:
-                return HttpResponse(
-                    json.dumps({"nothing to see": "this isn't happening"}),
-                    content_type="application/json"
-                )
-
+                return JsonResponse({"status": False, "message": {"error": form.errors}})
                 # Возвращаем ошиб
                 #return HttpResponse(form.errors.as_json())
     else:
