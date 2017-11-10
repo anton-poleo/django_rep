@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import json
+# import json
+from PIL import Image
 from models import Trader, Fund
 from django import forms
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
-from django.template import loader
-from django.core.validators import ValidationError
-from django.shortcuts import render_to_response, render
+# from django.template import loader
+# from django.core.validators import ValidationError
+from django.shortcuts import render
 from django.http import JsonResponse
 # Функция принимает form_id и вызвывает нужную регистрацию. Или здесь считывать id, тогда объединить формы.
 # Класс формы все поля по html. Заполняем, валидируем, что ужно конкатенируем и отправляем в model.create
@@ -17,8 +18,9 @@ from django.http import JsonResponse
 def registration(request):
     if request.method == "POST":
         if request.POST['form_id'] == 'trader':
-            form = RegistrationFormTrader(request.POST)
+            form = RegistrationFormTrader(request.POST, request.FILES)
             if form.is_valid():
+                # image = Image.open(request.FILES['logo'])
                 trader = Trader.objects.create(
                     name=form.cleaned_data.get('name'),
                     surname=form.cleaned_data.get('surname'),
@@ -40,15 +42,12 @@ def registration(request):
                 )
                 trader.save()
                 # редиректим на проверку номера, а затем в личный кабинет
-                return HttpResponse("eee")
+                return JsonResponse({"status": True})
             else:
                 return JsonResponse({"status": False, "message": {"error": form.errors}})
 
-                # Возвращаем объект json
-                # raise ValidationError('invalid field', code='invalid')
-                # return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
         else:
-            form = RegistrationFormFund(request.POST)
+            form = RegistrationFormFund(request.POST, request.FILES)
             if form.is_valid():
                 fund = Fund.objects.create(
                     name_fund=form.cleaned_data.get('name_fund'),
@@ -62,9 +61,9 @@ def registration(request):
                         'second_part_phone_number'),
                     email=form.cleaned_data.get('email'),
                     password=form.cleaned_data.get('password'),
-                    # password_repeat=form.cleaned_data('password_repeat'),
                     logo=form.cleaned_data.get('logo'),
-                    age_of_fund=form.cleaned_data.get('age_of_fund_year') + form.cleaned_data.get('age_of_fund_month'),
+                    age_of_fund=form.cleaned_data.get('age_of_fund_year') + ':' + form.cleaned_data.get(
+                        'age_of_fund_month'),
                     img_leader=form.cleaned_data.get('img_leader'),
                     link_facebook=form.cleaned_data.get('link_facebook'),
                     link_linkedIn=form.cleaned_data.get('link_linkedIn'),
@@ -73,11 +72,10 @@ def registration(request):
                 )
                 fund.save()
                 # редиректим на проверку номера, от туда в личный кабинет
-                return HttpResponse("eee")
+                return JsonResponse({"status": True})
             else:
                 return JsonResponse({"status": False, "message": {"error": form.errors}})
-                # Возвращаем ошиб
-                #return HttpResponse(form.errors.as_json())
+
     else:
         return render(request, 'registration/registration.html')
 
@@ -91,11 +89,8 @@ def reg_test(request):
         form = RegistrationFormFund(request.POST)
         if form.is_valid():
             type_of = type(form['age_of_fund_year'])
-            f = {'a': type_of, 'b': '2'}
             return HttpResponse(type_of)
         else:
-            # a = form['add_info']
-            b = form['second_part_phone_number']
             c = form.errors.as_json()
             return HttpResponse(c)
     else:
@@ -114,10 +109,10 @@ def register_trader(request):
                 country=form.cleaned_data.get('country'),
                 mail_code=form.cleaned_data.get('mail_code'),
                 address=form.cleaned_data.get('address'),
-                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get('second_part_phone_number'),
+                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
+                    'second_part_phone_number'),
                 email=form.cleaned_data.get('email'),
                 password=form.cleaned_data.get('password'),
-                # password_repeat=form.cleaned_data.get('password_repeat'),
                 logo=form.cleaned_data.get('logo'),
                 link_facebook=form.cleaned_data.get('link_facebook'),
                 link_linkedIn=form.cleaned_data.get('link_linkedIn'),
@@ -129,8 +124,6 @@ def register_trader(request):
             # редиректим на проверку номера, а затем в личный кабинет
             return HttpResponse("eee")
         else:
-            # Возвращаем объект json
-            # raise ValidationError('invalid field', code='invalid')
             return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
     else:
         form = RegistrationFormTrader()
@@ -150,12 +143,13 @@ def register_fund(request):
                 name_leader=form.cleaned_data.get('name_leader'),
                 surname_leader=form.cleaned_data.get('surname_leader'),
                 birthday=form.cleaned_data.get('birthday'),
-                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get('second_part_phone_number'),
+                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
+                    'second_part_phone_number'),
                 email=form.cleaned_data.get('email'),
                 password=form.cleaned_data.get('password'),
-                # password_repeat=form.cleaned_data('password_repeat'),
                 logo=form.cleaned_data.get('logo'),
-                age_of_fund=form.cleaned_data.get('age_of_fund_year') + form.cleaned_data.get('age_of_fund_month'),
+                age_of_fund=form.cleaned_data.get('age_of_fund_year') + ':' + form.cleaned_data.get(
+                    'age_of_fund_month'),
                 img_leader=form.cleaned_data.get('img_leader'),
                 link_facebook=form.cleaned_data.get('link_facebook'),
                 link_linkedIn=form.cleaned_data.get('link_linkedIn'),
@@ -190,7 +184,8 @@ class RegistrationFormTrader(forms.Form):
     birthday = forms.DateField(
         required=True,
         error_messages={'required': 'Please enter your birthday',
-                        'invalid': '%Y-%m-%d, %m/%d/%Y, %m/%d/%y'}
+                        'invalid': 'Please enter your birthday in format:'
+                                   '%Y-%m-%d, %m/%d/%Y, %m/%d/%y'}
     )
     country = forms.CharField(
         max_length=50,
@@ -198,10 +193,8 @@ class RegistrationFormTrader(forms.Form):
         error_messages={'required': 'Please enter your country',
                         'max_length': 'max length = 50 characters'}
     )
-    # Сколько может быть цифр максимально в почтовом коде?
     validator_mail_code = RegexValidator(regex=r'^\d{5,20}$',
                                          message='invalid mail code',
-                                         # inverse_match=True
                                          )
     mail_code = forms.CharField(
         validators=[validator_mail_code],
@@ -211,18 +204,17 @@ class RegistrationFormTrader(forms.Form):
     )
     address = forms.CharField(
         required=True,
-        max_length=150,
+        max_length=100,
         error_messages={'required': 'Please enter your country',
-                        'max_length': 'max length = 150 characters'}
+                        'max_length': 'max length = 100 characters'}
     )
 
     first_part_phone_number = forms.CharField(
-        # validators=[phone_regex],
         required=True,
         error_messages={'required': 'Please enter your phone'}
     )
     phone_regex = RegexValidator(regex=r'^\d{10}$',
-                                 message="Phone number must be entered in the format:"
+                                 message="Phone number must be entered in the format: xxxxxxxxxx"
                                  )
     second_part_phone_number = forms.CharField(
         validators=[phone_regex],
@@ -233,18 +225,16 @@ class RegistrationFormTrader(forms.Form):
         required=True,
         error_messages={'required': 'Please enter your email'}
     )
-    # validator_password = RegexValidator(regex=r'')
     password = forms.CharField(
         min_length=6,
         max_length=100,
         required=True,
-        error_messages={'required': 'Please enter your passwd'}
-        # Валидатор на условия
-        # Узнать как хешировать и солировать пароль
+        error_messages={'required': 'Please enter your password',
+                        'min_length': 'min length 6 characters'}
     )
     password_repeat = forms.CharField(
         required=True,
-        error_messages={'required': 'Please enter your passwd'}
+        error_messages={'required': 'Please repeat your password'}
     )
     logo = forms.ImageField(
         # links
@@ -261,10 +251,13 @@ class RegistrationFormTrader(forms.Form):
 
     invest_year = forms.CharField(
         max_length=2,
+        error_messages={'max_length': 'max length 2 characters',
+                        'required': 'Please enter your invest time'}
     )
-    # invest_month_validator = RegexValidator(regex=r'')
     invest_month = forms.CharField(
         max_length=2,
+        error_messages={'max_length': 'max length 2 characters',
+                        'required': 'Please enter your invest time'}
     )
 
     radio_name1 = forms.CharField(
@@ -287,7 +280,6 @@ class RegistrationFormTrader(forms.Form):
             raise forms.ValidationError("Password repeat does not match")
 
 
-# То же самое для фонда
 class RegistrationFormFund(forms.Form):
     name_fund = forms.CharField(
         max_length=100,
@@ -328,7 +320,8 @@ class RegistrationFormFund(forms.Form):
     birthday = forms.DateField(
         required=True,
         error_messages={'required': 'Please enter your birthday',
-                        'invalid': '%Y-%m-%d, %m/%d/%Y, %m/%d/%y'}
+                        'invalid': 'Please enter your birthday in format:'
+                                   '%Y-%m-%d, %m/%d/%Y, %m/%d/%y'}
     )
     first_part_phone_number = forms.CharField(
         required=True,
@@ -340,7 +333,8 @@ class RegistrationFormFund(forms.Form):
     second_part_phone_number = forms.CharField(
         required=True,
         validators=[phone_regex],
-        max_length=10
+        max_length=10,
+        error_messages={'required': 'Please enter your phone'}
     )
     email = forms.EmailField(
         required=True,
@@ -349,23 +343,28 @@ class RegistrationFormFund(forms.Form):
     password = forms.CharField(
         required=True,
         max_length=100,
-        min_length=6
+        min_length=6,
+        error_messages={'required': 'Please enter your password',
+                        'min_length': 'min length 6 characters'}
     )
     password_repeat = forms.CharField(
         required=True,
         max_length=100,
-        min_length=6
+        min_length=6,
+        error_messages={'required': 'Please repeat your password'}
     )
     logo = forms.ImageField(
         required=False
     )
     age_of_fund_year = forms.CharField(
         required=True,
-        max_length=3
+        max_length=3,
+        error_messages={'required': 'Please enter age of your fund'}
     )
     age_of_fund_month = forms.CharField(
         required=True,
-        max_length=3
+        max_length=3,
+        error_messages={'required': 'Please enter age of your fund'}
     )
     img_leader = forms.ImageField(
         required=False

@@ -8,6 +8,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>Page</title>
 		<link rel="stylesheet" media="all" href="{% static 'css/styles.css' %}" >
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109072219-1"></script>
 	</head>
 	<body>
 		<div class="wrapper bg_style2">
@@ -51,7 +53,7 @@
 						<li><a href="#tab2">Фондом</a></li>
 					</ul>
 
-					<form id="tab1" method="post" action="">
+					<form id="tab1" enctype="multipart/form-data" method="post" action="">
 						{% csrf_token %}
 						<div class="form_style3">
 							<div class="col_set7">
@@ -202,7 +204,19 @@
 							<input class="btn_style btn_size2" type="submit" value="Сохранить">
 						</div>
 					</form>
-					<form id="tab2" method="post" action="">
+					<script type="text/javascript">
+        				$( document ).ready(function(){
+            				form_handler("tab1", function(data){
+                				$('#tab1').parent().html('<h2>Thank you for the subscription!</h2>');
+                				gtag('event', 'subscribe_main_page', {
+                    				'event_category': 'Subscribe',
+                    				'event_action': 'Subscribe',
+                    				'event_label': 'Mainpage'
+                				});
+            				});
+        				});
+        			</script>
+					<form id="tab2" enctype="multipart/form-data" method="post" action="">
 						{% csrf_token %}
 						<div class="form_style3">
 							<div class="col_set7">
@@ -369,6 +383,18 @@
 							<input class="btn_style btn_size2" type="submit" value="Зарегистрироваться">
 						</div>
 					</form>
+					<script type="text/javascript">
+        				$( document ).ready(function(){
+            				form_handler("tab2", function(data){
+                				$('#tab2').parent().html('<h2>Thank you for the subscription!</h2>');
+                				gtag('event', 'subscribe_main_page', {
+                    				'event_category': 'Subscribe',
+                    				'event_action': 'Subscribe',
+                    				'event_label': 'Mainpage'
+                				});
+            				});
+        				});
+        			</script>
 				</div>
 			</div>
 			<!-- .content-->
@@ -412,7 +438,7 @@
 		</div>
 		<!-- Scripts-->
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-		<!--<script src="{% static  'scripts/scripts.js' %}"></script>-->
+		<script src="{% static  'scripts/scripts.js' %}"></script>
 		<script src="{% static  'scripts/jquery-ui.js' %}"></script>
 		<script src="{% static  'scripts/wow.min.js' %}"></script>
 		<script src="{% static  'scripts/clipboard.js' %}"></script>
