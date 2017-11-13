@@ -142,6 +142,13 @@
 										</div>
 										<div class="inline-block">
 											<input name="logo" type="file" hidden id="btn-file1" accept="image/jpg,image/png,image/bmp">
+											<script>
+											var files; // переменная. будет содержать данные файлов
+											// заполняем переменную данными, при изменении значения поля file
+											$('input[type=file]').on('change', function(){
+											files = this.files;
+											});
+											</script>
 											<label class="align-bottom btn_style" for="btn-file1">Добавить фото</label>
 										</div>
 										<div class="inline-block align-middle">jpg, png, bmp</div>
@@ -196,7 +203,7 @@
 						</div>
 						<div class="align-center">
 							<div class="input-btn input-btn_set3">
-								<input type="checkbox" id="checkbox1" checked>
+								<input type="checkbox" id="checkbox1"  checked>
 								<label for="checkbox1"><span></span><i class="fs14">Я принимаю условия <a class="link_style4" href="#">Публичной оферты </a>и даю  платформе Safinum согласие на обработку персональных данных в соответствии с <a class="link_style4" href="#">Политикой конфиденциальности </a>платформы</i></label>
 							</div>
 						</div>

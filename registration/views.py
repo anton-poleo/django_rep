@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 # import json
-from PIL import Image
-from models import Trader, Fund
+from models import Trader, Fund, Investor
 from django import forms
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
@@ -80,22 +79,48 @@ def registration(request):
         return render(request, 'registration/registration.html')
 
 
+def handle_uploaded_file(f):
+    with open('/srv/media/data.txt', 'wb+') as dest:
+        for chunk in f.chunks():
+            dest.write(chunk)
+
+
+def registration_investor(request):
+    if request.method == "POST":
+        form = RegistrationFormInvestor(request.POST)
+        if form.is_valid():
+            investor = Investor.objects.create(
+                name=form.cleaned_data.get('name'),
+                surname=form.cleaned_data.get('surname'),
+                country=form.cleaned_data.get('country'),
+                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
+                    'second_part_phone_number'),
+                email=form.cleaned_data.get('email'),
+                password=form.cleaned_data.get('password'),
+            )
+            investor.save()
+            # редиректим на проверку номера, а затем в личный кабинет
+            return HttpResponse("eee")
+        else:
+            return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
+    else:
+        form = RegistrationFormInvestor()
+        return render(request, 'registration/reg_investor.html', {'form': form})
+
+
 def index(request):
     return render(request, 'registration/registration.html')
 
 
 def reg_test(request):
     if request.method == "POST":
-        form = RegistrationFormFund(request.POST)
+        form = RegistrationFormInvestor(request.POST)
         if form.is_valid():
-            type_of = type(form['age_of_fund_year'])
-            return HttpResponse(type_of)
+            return JsonResponse({"status": True})
         else:
-            c = form.errors.as_json()
-            return HttpResponse(c)
+            return JsonResponse({"status": False, "message": {"error": form.errors}})
     else:
-        form = RegistrationFormFund()
-        return render(request, 'registration/registration.html', {'form': form})
+        return render(request, 'registration/reg_investor.html')
 
 
 def register_trader(request):
@@ -241,11 +266,9 @@ class RegistrationFormTrader(forms.Form):
         required=False
     )
     link_facebook = forms.CharField(
-        empty_value=None,
         required=False,
     )
     link_linkedIn = forms.CharField(
-        empty_value=None,
         required=False,
     )
 
@@ -265,11 +288,14 @@ class RegistrationFormTrader(forms.Form):
         required=False
     )
     add_info = forms.CharField(
-        empty_value=None,
         required=False,
         max_length=2000,
         error_messages={'max_length': 'max length 2000 characters',
                         }
+    )
+    agreement = forms.CharField(
+        required=True,
+        error_messages={'required': 'please '}
     )
 
     def clean(self):
@@ -391,9 +417,76 @@ class RegistrationFormFund(forms.Form):
                         'max_length': 'max length = 50 characters'}
 
     )
+    agreement = forms.CharField(
+        required=True,
+        error_messages={'required': 'please '}
+    )
 
     def clean(self):
         cleaned_data = super(RegistrationFormFund, self).clean()
+        password = cleaned_data.get("password")
+        password_repeat = cleaned_data.get("password_repeat")
+        if password != password_repeat:
+            raise forms.ValidationError("Password repeat does not match")
+
+
+class RegistrationFormInvestor(forms.Form):
+    name = forms.CharField(
+        max_length=100,
+        required=True,
+        error_messages={"required": "Please enter your name",
+                        "max_length": "max length 100 character"}
+    )
+    surname = forms.CharField(
+        max_length=100,
+        required=True,
+        error_messages={"required": "Please enter your surname",
+                        "max_length": "max length 100 character"}
+    )
+    country = forms.CharField(
+        max_length=100,
+        required=True,
+        error_messages={"required": "Please enter your country",
+                        "max_length": "max length 100 character"}
+    )
+    first_part_phone_number = forms.CharField(
+        required=True,
+        max_length=3
+    )
+    phone_regex = RegexValidator(regex=r'^\d{10}$',
+                                 message="Phone number must be entered in the format:"
+                                         " '+999999999'. Up to 15 digits allowed.")
+    second_part_phone_number = forms.CharField(
+        required=True,
+        validators=[phone_regex],
+        max_length=10,
+        error_messages={'required': 'Please enter your phone'}
+    )
+    email = forms.EmailField(
+        required=True,
+        error_messages={'required': 'Please enter your email'}
+    )
+    password = forms.CharField(
+        required=True,
+        max_length=100,
+        min_length=6,
+        error_messages={'required': 'Please enter your password',
+                        'min_length': 'min length 6 characters'}
+    )
+    password_repeat = forms.CharField(
+        required=True,
+        max_length=100,
+        min_length=6,
+        error_messages={'required': 'Please enter your password',
+                        'min_length': 'min length 6 characters'}
+    )
+    agreement = forms.CharField(
+        required=True,
+        error_messages={'required': 'please '}
+    )
+
+    def clean(self):
+        cleaned_data = super(RegistrationFormInvestor, self).clean()
         password = cleaned_data.get("password")
         password_repeat = cleaned_data.get("password_repeat")
         if password != password_repeat:

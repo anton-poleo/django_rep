@@ -13,9 +13,9 @@ class Trader(models.Model):
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField()
     password = models.CharField(max_length=100)
-    logo = models.ImageField()
-    link_facebook = models.CharField(max_length=100)
-    link_linkedIn = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to='img', default=None, blank=True)
+    link_facebook = models.CharField(max_length=100, default=None)
+    link_linkedIn = models.CharField(max_length=100, default=None)
     # инвестиции в активы. гг:мм
     invest_time = models.CharField(max_length=100)
     # инвестировали ли вы до этого
@@ -27,7 +27,6 @@ class Trader(models.Model):
 
 
 class Fund(models.Model):
-
     name_fund = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     mail_code = models.IntegerField()
@@ -49,3 +48,15 @@ class Fund(models.Model):
 
     class Meta:
         db_table = "fund"
+
+
+class Investor(models.Model):
+    name = models.CharField(max_length=100)
+    surname = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = "investor"
+

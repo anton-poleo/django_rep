@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Page</title>
+		<link rel="stylesheet" media="all" href="{% static 'css/styles.css' %}" >
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109072219-1"></script>
+	</head>
+	<body>
+		<div class="wrapper bg_style2">
+			<div class="header header_border">
+				<div class="container clearfix"><a class="logo" href="#"><img src="img/logo.png" alt=""></a>
+					<ul class="menu">
+						<li class="only-mob"><a class="menu_close">✕</a></li>
+						<li><a href="#">ICO</a></li>
+						<li><a href="#">Рейтинг трейдеров</a></li>
+						<li><a href="#">Биржа</a></li>
+						<li><a href="#">ICO-трекер</a></li>
+					</ul>
+					<div class="pull-right">
+						<div class="inline-block align-middle header-social"><span class="align-middle">Наши чаты:</span>
+							<div class="social"><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_1.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_2.png" alt=""></a></div>
+						</div>
+						<div class="inline-block align-middle lang-container"><a class="lang-btn" href="#">Ru</a>
+							<ul class="lang-list">
+								<li><a href="#"><img src="img/flag_1.png" alt=""><span>English</span></a></li>
+								<li><a href="#"><img src="img/flag_2.png" alt=""><span>Русский</span></a></li>
+								<li><a href="#"><img src="img/flag_3.png" alt=""><span>中文</span></a></li>
+								<li><a href="#"><img src="img/flag_4.png" alt=""><span>日本語</span></a></li>
+								<li><a href="#"><img src="img/flag_5.png" alt=""><span>한국어</span></a></li>
+								<li class="mb0"><a href="#"><img src="img/flag_6.png" alt=""><span>English</span></a></li>
+								<li class="mb0"><a href="#"><img src="img/flag_7.png" alt=""><span>Deutsch</span></a></li>
+								<li class="mb0"><a href="#"><img src="img/flag_8.png" alt=""><span>िंदी</span></a></li>
+								<li class="mb0 mb0_mob"><a href="#"><img src="img/flag_9.png" alt=""><span>Español</span></a></li>
+								<li class="mb0 mb0_mob"><a href="#"><img src="img/flag_10.png" alt=""><span>Français</span></a></li>
+							</ul>
+						</div><a class="btn_style only-pc-tab" href="enter.html">Войти</a><a class="nav-icon btn-mob-nav"><span></span><span></span><span></span><span></span></a>
+					</div>
+				</div>
+			</div>
+			<!-- .header-->
+			<div class="content bg-none">
+				<div class="container slide_set" id="tabs">
+					<div class="title fs32 margin_set3">Регистрация инвестора</div>
+					<form id="tab1" enctype="multipart/form-data" method="post" action="">
+						{% csrf_token %}
+						<div class="form_style3">
+							<div class="col_set7">
+								<div class="margin_set3">
+									<div class="margin_set12">
+										<div  class="field-label">Имя:</div>
+										<div class="field">
+											<input name="name" type="text">
+										</div>
+									</div>
+									<div class="margin_set12">
+										<div class="field-label">Фамилия:</div>
+										<div class="field">
+											<input name="surname" type="text">
+										</div>
+									</div>
+									<div class="margin_set12">
+										<div class="field-label">Страна проживания:</div>
+										<div class="field">
+											<select name="country">
+												<option>Страна 1</option>
+												<option>Страна 2</option>
+												<option>Страна 3</option>
+											</select>
+										</div>
+									</div>
+								
+								</div>
+							</div>
+							<div class="col_set7 padding_set10">
+								<div class="margin_set3">
+
+									<div class="field-label">Номер мобильного телефона:</div>
+									<div class="field field_size3">
+										<select name="first_part_phone_number">
+											<option>+44</option>
+											<option>+44</option>
+											<option>+44</option>
+										</select>
+									</div>
+									<div class="field field_size4">
+										<input name="second_part_phone_number" type="text">
+									</div>
+									<div class="field-label">E-mail:</div>
+										<div class="field">
+											<input name="email" type="text">
+										</div>
+										
+									<div class="field-label">Пароль:</div>
+									<div class="field">
+										<input name="password" type="password">
+									</div>
+									
+										
+									<div class="field-label">Повтор пароля:</div>
+									<div class="field">
+										<input name="password_repeat" type="password">
+									</div>	
+								</div>
+								
+					
+							</div>
+						</div>
+						<div class="align-center">
+							<div class="input-btn input-btn_set3">
+								<input type="checkbox" id="checkbox1" checked>
+								<label for="checkbox1"><span></span><i class="fs14">Я принимаю условия <a class="link_style4" href="#">Публичной оферты </a>и даю  платформе Safinum согласие на обработку персональных данных в соответствии с <a class="link_style4" href="#">Политикой конфиденциальности </a>платформы</i></label>
+							</div>
+						</div>
+						<div class="form-btn">
+							<input class="btn_style btn_size2" type="submit" value="Сохранить">
+						</div>
+					</form>
+					<script type="text/javascript">
+        				$( document ).ready(function(){
+            				form_handler("tab1", function(data){
+                				$('#tab1').parent().html('<h2>Thank you for the subscription!</h2>');
+                				gtag('event', 'subscribe_main_page', {
+                    				'event_category': 'Subscribe',
+                    				'event_action': 'Subscribe',
+                    				'event_label': 'Mainpage'
+                				});
+            				});
+        				});
+        			</script>
+				</div>
+			</div>
+			<!-- .content-->
+		</div>
+		<div class="footer">
+			<div class="container clearfix">
+				<div class="copyright only-pc-tab">© 2017 -  Safinum.com</div>
+				<div class="footer-menu">
+					<ul>
+						<li><a href="#">Инвесторам</a></li>
+						<li><a href="#">Трейдерам</a></li>
+						<li><a href="#">Фондам</a></li>
+						<li><a href="#">ICO</a></li>
+					</ul>
+					<ul>
+						<li><a href="#">ICO - трекер</a></li>
+						<li><a href="#">Рейтинг фондов</a></li>
+					</ul>
+					<ul class="size_set">
+						<li><a href="#">FAQ</a></li>
+						<li><a href="#">Блог</a></li>
+						<li><a href="#">Контакты</a></li>
+					</ul>
+				</div>
+				<div class="pull-right">
+					<div class="title_soc">Следите за нами:</div>
+					<div class="social"><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_1.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_2.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_3.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_4.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_5.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_6.png" alt=""></a><a class="item-soc" href="#" target="_blank"><img src="img/soc-icon_7.png" alt=""></a></div>
+				</div>
+				<div class="copyright only-mob">© 2017 -  Safinum.com</div>
+			</div>
+		</div>
+		<!-- .footer-->
+		<div class="popwindow" id="popup-balance" data-title="" data-height="auto">
+			<div class="popup-style">
+				<div class="popup_set"><a class="bw_close popup-close"></a>
+					<div class="popup-content">
+						<div class="text_style7 fs20 margin_set12">Чтобы создать портфель, у вас на балансе должно быть не менее 5 000 токенов SAF.</div><a class="btn_style btn_size2" href="#">Пополнить баланс</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Scripts-->
+		<script src="{% static  'scripts/scripts.js' %}"></script>
+		<script src="{% static  'scripts/jquery-ui.js' %}"></script>
+		<script src="{% static  'scripts/wow.min.js' %}"></script>
+		<script src="{% static  'scripts/clipboard.js' %}"></script>
+		<script src="{% static  'scripts/ion.rangeSlider.js' %}"></script>
+		<script src="{% static  'scripts/slick.js' %}"></script>
+		<script src="{% static  'scripts/main.js' %}"></script>
+	</body>
+</html>

@@ -82,7 +82,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -118,12 +117,16 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
+VERSION_PATH = 'ver109/'
+STATIC_URL = '/static/' + VERSION_PATH
+STATIC_ROOT = os.path.join(BASE_DIR, '../../../public_html/static' + VERSION_PATH)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '../../../public_html/media')
 
-STATIC_URL = '/static/'
 # STATIC_ROOT = ''
 #
 # STATICFILES_DIRS = (
 #    os.path.join(BASE_DIR, "/registration/style"),
 #    '/home/anton/djangoProjects/mysite/registration/static/css',
 # )
-# MEDIA_URL = ''
+
