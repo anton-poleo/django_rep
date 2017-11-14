@@ -141,12 +141,11 @@
 											<div class="text_style7 fs13">(будет отображаться профиле фонда)</div>
 										</div>
 										<div class="inline-block">
-											<input name="logo" type="file" hidden id="btn-file1" accept="image/jpg,image/png,image/bmp">
+											<input class="target" name="logo" type="file" hidden id="btn-file1" accept="image/jpg,image/png,image/bmp">
 											<script>
-											var files; // переменная. будет содержать данные файлов
-											// заполняем переменную данными, при изменении значения поля file
-											$('input[type=file]').on('change', function(){
-											files = this.files;
+
+											$(".target").change(function(){
+												alert($("form input[type=file]").val());
 											});
 											</script>
 											<label class="align-bottom btn_style" for="btn-file1">Добавить фото</label>

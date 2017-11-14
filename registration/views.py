@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-# import json
 from models import Trader, Fund, Investor
 from django import forms
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
-# from django.template import loader
-# from django.core.validators import ValidationError
 from django.shortcuts import render
 from django.http import JsonResponse
-# Функция принимает form_id и вызвывает нужную регистрацию. Или здесь считывать id, тогда объединить формы.
-# Класс формы все поля по html. Заполняем, валидируем, что ужно конкатенируем и отправляем в model.create
-# Create your views here.
 
 
 def registration(request):
@@ -19,7 +13,6 @@ def registration(request):
         if request.POST['form_id'] == 'trader':
             form = RegistrationFormTrader(request.POST, request.FILES)
             if form.is_valid():
-                # image = Image.open(request.FILES['logo'])
                 trader = Trader.objects.create(
                     name=form.cleaned_data.get('name'),
                     surname=form.cleaned_data.get('surname'),
@@ -40,7 +33,6 @@ def registration(request):
                     add_info=form.cleaned_data.get('add_info')
                 )
                 trader.save()
-                # редиректим на проверку номера, а затем в личный кабинет
                 return JsonResponse({"status": True})
             else:
                 return JsonResponse({"status": False, "message": {"error": form.errors}})
@@ -79,12 +71,6 @@ def registration(request):
         return render(request, 'registration/registration.html')
 
 
-def handle_uploaded_file(f):
-    with open('/srv/media/data.txt', 'wb+') as dest:
-        for chunk in f.chunks():
-            dest.write(chunk)
-
-
 def registration_investor(request):
     if request.method == "POST":
         form = RegistrationFormInvestor(request.POST)
@@ -108,10 +94,6 @@ def registration_investor(request):
         return render(request, 'registration/reg_investor.html', {'form': form})
 
 
-def index(request):
-    return render(request, 'registration/registration.html')
-
-
 def reg_test(request):
     if request.method == "POST":
         form = RegistrationFormInvestor(request.POST)
@@ -121,75 +103,6 @@ def reg_test(request):
             return JsonResponse({"status": False, "message": {"error": form.errors}})
     else:
         return render(request, 'registration/reg_investor.html')
-
-
-def register_trader(request):
-    if request.method == "POST":
-        form = RegistrationFormTrader(request.POST)
-        if form.is_valid():
-            trader = Trader.objects.create(
-                name=form.cleaned_data.get('name'),
-                surname=form.cleaned_data.get('surname'),
-                birthday=form.cleaned_data.get('birthday'),
-                country=form.cleaned_data.get('country'),
-                mail_code=form.cleaned_data.get('mail_code'),
-                address=form.cleaned_data.get('address'),
-                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
-                    'second_part_phone_number'),
-                email=form.cleaned_data.get('email'),
-                password=form.cleaned_data.get('password'),
-                logo=form.cleaned_data.get('logo'),
-                link_facebook=form.cleaned_data.get('link_facebook'),
-                link_linkedIn=form.cleaned_data.get('link_linkedIn'),
-                invest_time=form.cleaned_data.get('invest_year') + ":" + form.cleaned_data.get('invest_month'),
-                radio_name1=form.cleaned_data.get('radio_name1'),
-                add_info=form.cleaned_data.get('add_info')
-            )
-            trader.save()
-            # редиректим на проверку номера, а затем в личный кабинет
-            return HttpResponse("eee")
-        else:
-            return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
-    else:
-        form = RegistrationFormTrader()
-        return render(request, 'registration/registration.html', {'form': form})
-
-
-def register_fund(request):
-
-    if request.method == "POST":
-        form = RegistrationFormFund(request.POST)
-        if form.is_valid():
-            fund = Fund.objects.create(
-                name_fund=form.cleaned_data.get('name_fund'),
-                country=form.cleaned_data.get('country'),
-                mail_code=form.cleaned_data.get('mail_code'),
-                address=form.cleaned_data.get('address'),
-                name_leader=form.cleaned_data.get('name_leader'),
-                surname_leader=form.cleaned_data.get('surname_leader'),
-                birthday=form.cleaned_data.get('birthday'),
-                phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
-                    'second_part_phone_number'),
-                email=form.cleaned_data.get('email'),
-                password=form.cleaned_data.get('password'),
-                logo=form.cleaned_data.get('logo'),
-                age_of_fund=form.cleaned_data.get('age_of_fund_year') + ':' + form.cleaned_data.get(
-                    'age_of_fund_month'),
-                img_leader=form.cleaned_data.get('img_leader'),
-                link_facebook=form.cleaned_data.get('link_facebook'),
-                link_linkedIn=form.cleaned_data.get('link_linkedIn'),
-                add_info_fund=form.cleaned_data.get('add_info_fund'),
-                add_info_leader=form.cleaned_data.get('add_info_leader')
-            )
-            fund.save()
-            # редиректим на проверку номера, от туда в личный кабинет
-            return HttpResponse("eee")
-        else:
-            # Возвращаем ошиб
-            return HttpResponse(form.errors.as_json())
-    else:
-        form = RegistrationFormTrader()
-        return render(request, 'registration/registration.html', {'form': form})
 
 
 class RegistrationFormTrader(forms.Form):
@@ -238,7 +151,7 @@ class RegistrationFormTrader(forms.Form):
         required=True,
         error_messages={'required': 'Please enter your phone'}
     )
-    phone_regex = RegexValidator(regex=r'^\d{10}$',
+    phone_regex = RegexValidator(regex=r'^\d{9,15}$',
                                  message="Phone number must be entered in the format: xxxxxxxxxx"
                                  )
     second_part_phone_number = forms.CharField(
@@ -293,10 +206,10 @@ class RegistrationFormTrader(forms.Form):
         error_messages={'max_length': 'max length 2000 characters',
                         }
     )
-    agreement = forms.CharField(
-        required=True,
-        error_messages={'required': 'please '}
-    )
+    # agreement = forms.CharField(
+    #    required=True,
+    #    error_messages={'required': 'please '}
+    # )
 
     def clean(self):
         cleaned_data = super(RegistrationFormTrader, self).clean()

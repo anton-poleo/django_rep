@@ -119,9 +119,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 VERSION_PATH = 'ver109/'
 STATIC_URL = '/static/' + VERSION_PATH
-STATIC_ROOT = os.path.join(BASE_DIR, '../../../public_html/static' + VERSION_PATH)
+STATIC_ROOT = '/home/anton/public_html/static'
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '../../../public_html/media')
+MEDIA_ROOT = '/home/anton/public_html/media'
 
 # STATIC_ROOT = ''
 #

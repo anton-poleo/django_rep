@@ -37,10 +37,10 @@ class Fund(models.Model):
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField()
     password = models.CharField(max_length=100)
-    logo = models.ImageField()
+    logo = models.ImageField(upload_to='img', default=None, blank=True)
     # Форматирование гг.мм
     age_of_fund = models.CharField(max_length=100)
-    img_leader = models.ImageField()
+    img_leader = models.ImageField(upload_to='img', default=None, blank=True)
     link_facebook = models.CharField(max_length=100)
     link_linkedIn = models.CharField(max_length=100)
     add_info_fund = models.CharField(max_length=2000)
