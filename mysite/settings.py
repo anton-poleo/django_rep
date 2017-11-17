@@ -129,4 +129,3 @@ MEDIA_ROOT = '/home/anton/public_html/media'
 #    os.path.join(BASE_DIR, "/registration/style"),
 #    '/home/anton/djangoProjects/mysite/registration/static/css',
 # )
-

@@ -20,7 +20,7 @@ function form_handler(form_id, success_function)
             success : function(data) {
                 if (data.status)
                 {
-                    success_function(data);
+                    success_function(data)
                 }
                 else
                 {

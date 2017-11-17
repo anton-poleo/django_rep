@@ -3,9 +3,53 @@ from __future__ import unicode_literals
 from models import Trader, Fund, Investor
 from django import forms
 from django.core.validators import RegexValidator
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
+from django.contrib.auth.models import User, Permission
+from django.contrib.auth import authenticate, login
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.decorators import permission_required
+import random
+# from django.shortcuts import redirect
+
+content_type = ContentType.objects.get(app_label='registration', model='access')
+permission = Permission.objects.get_or_create(codename='rights',
+                                              name='Global customer rights',
+                                              content_type=content_type)
+
+
+def send_code(phone, code):
+    return True
+
+
+def test(request):
+    request.session['name'] = 'anton'
+    return HttpResponse(request.session)
+
+
+@permission_required('registration.rights')
+def test2(request):
+    if request.method == 'POST':
+        form = VerificationForm(request.POST)
+        if form.is_valid():
+            if request.session['code'] == form.cleaned_data.get('code'):
+                return HttpResponse('User')
+            else:
+                return HttpResponse('None')
+        else:
+            return JsonResponse({"status": False,
+                                 "message": {"error": form.errors}})
+    else:
+        return render(request, 'registration/verification.html')
+
+
+def code_generator():
+    count = 0
+    result = ''
+    while count != 4:
+        result += str(random.randint(0, 9))
+        count += 1
+    return result
 
 
 def registration(request):
@@ -23,19 +67,55 @@ def registration(request):
                     phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
                         'second_part_phone_number'),
                     email=form.cleaned_data.get('email'),
-                    password=form.cleaned_data.get('password'),
-                    # password_repeat=form.cleaned_data.get('password_repeat'),
                     logo=form.cleaned_data.get('logo'),
                     link_facebook=form.cleaned_data.get('link_facebook'),
                     link_linkedIn=form.cleaned_data.get('link_linkedIn'),
                     invest_time=form.cleaned_data.get('invest_year') + ":" + form.cleaned_data.get('invest_month'),
                     investments=form.cleaned_data.get('radio_name1'),
                     add_info=form.cleaned_data.get('add_info')
+                    # добавляем код в базу данных?
                 )
                 trader.save()
-                return JsonResponse({"status": True})
+
+                # создаем пользователя
+                user = User.objects.create_user(username=form.cleaned_data.get('email'),
+                                                password=form.cleaned_data.get('password'))
+                user.save()
+                user.user_permissions.add(permission)
+                # аутентифицируем пользователя в системе
+                user = authenticate(username=form.cleaned_data.get('email'),
+                                    password=form.cleaned_data.get('password'))
+
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        # Redirect to a success page.
+                    else:
+                        return JsonResponse
+                # Return a 'disabled account' error message
+
+                else:
+                    return JsonResponse
+                # Return an 'invalid login' error message.
+
+                # генерируем проверочный код для верификации
+                code = code_generator()
+
+                # ___________________________________исправить высылаемовый код пользователю____________________________
+                # ______________________________________________________________________________________________________
+                request.session['code'] = '1111'
+
+                # отправляем сгенерированный код на номер телефона
+                # если не доставлено, то делаем что-то
+                if not send_code(code, form.cleaned_data.get('phone_number')):
+                    pass
+
+                return JsonResponse({'status': True,
+                                     "message": "/registration/test2/"})
             else:
-                return JsonResponse({"status": False, "message": {"error": form.errors}})
+                return JsonResponse({"status": False,
+                                     "message": {"error": form.errors}})
+                # return HttpResponse(request.session)
 
         else:
             form = RegistrationFormFund(request.POST, request.FILES)
@@ -51,7 +131,6 @@ def registration(request):
                     phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
                         'second_part_phone_number'),
                     email=form.cleaned_data.get('email'),
-                    password=form.cleaned_data.get('password'),
                     logo=form.cleaned_data.get('logo'),
                     age_of_fund=form.cleaned_data.get('age_of_fund_year') + ':' + form.cleaned_data.get(
                         'age_of_fund_month'),
@@ -62,10 +141,18 @@ def registration(request):
                     add_info_leader=form.cleaned_data.get('add_info_leader')
                 )
                 fund.save()
+
+                # user = User.objects.create_user(username=form.cleaned_data.get('email'),
+                #                                password=form.cleaned_data.get('password'))
+                # user.save()
+                # user = authenticate(username=form.cleaned_data.get('email'),
+                #                    password=form.cleaned_data.get('password'))
                 # редиректим на проверку номера, от туда в личный кабинет
-                return JsonResponse({"status": True})
+                return JsonResponse({'status': True,
+                                     "message": "/registration/verification/"})
             else:
-                return JsonResponse({"status": False, "message": {"error": form.errors}})
+                return JsonResponse({"status": False,
+                                     "message": {"error": form.errors}})
 
     else:
         return render(request, 'registration/registration.html')
@@ -82,16 +169,14 @@ def registration_investor(request):
                 phone_number=form.cleaned_data.get('first_part_phone_number') + form.cleaned_data.get(
                     'second_part_phone_number'),
                 email=form.cleaned_data.get('email'),
-                password=form.cleaned_data.get('password'),
             )
             investor.save()
             # редиректим на проверку номера, а затем в личный кабинет
-            return HttpResponse("eee")
+            return JsonResponse({'status': True, "message": "/registration/verification/"})
         else:
-            return JsonResponse({'Status': False, 'message': {'errors': form.errors}})
+            return JsonResponse({'status': False, 'message': {'errors': form.errors}})
     else:
-        form = RegistrationFormInvestor()
-        return render(request, 'registration/reg_investor.html', {'form': form})
+        return render(request, 'registration/reg_investor.html')
 
 
 def reg_test(request):
@@ -105,9 +190,31 @@ def reg_test(request):
         return render(request, 'registration/reg_investor.html')
 
 
+def verification(request):
+    if request.method == "POST":
+        form = VerificationForm(request.POST)
+        if form.is_valid():
+            if form.code == request.session['code']:
+
+                # request.user.user_permission.add(permission)
+                return JsonResponse({'status': True})
+            else:
+                return JsonResponse({'status': False, 'message': 'invalid code'})
+        else:
+            return JsonResponse({'status': False, 'message': 'Please, enter the code'})
+    else:
+        return render(request, 'registration/verification.html')
+
+
+class VerificationForm(forms.Form):
+    code = forms.CharField(
+        max_length=10,
+        required=True
+    )
+
+
 class RegistrationFormTrader(forms.Form):
     name = forms.CharField(
-        label='Имя',
         max_length=100,
         required=True,
         error_messages={'required': 'Please enter your name',
@@ -152,7 +259,7 @@ class RegistrationFormTrader(forms.Form):
         error_messages={'required': 'Please enter your phone'}
     )
     phone_regex = RegexValidator(regex=r'^\d{9,15}$',
-                                 message="Phone number must be entered in the format: xxxxxxxxxx"
+                                 message="Invalid phone number"
                                  )
     second_part_phone_number = forms.CharField(
         validators=[phone_regex],
@@ -206,10 +313,10 @@ class RegistrationFormTrader(forms.Form):
         error_messages={'max_length': 'max length 2000 characters',
                         }
     )
-    # agreement = forms.CharField(
-    #    required=True,
-    #    error_messages={'required': 'please '}
-    # )
+    agreement = forms.CharField(
+        required=True,
+        error_messages={'required': 'please '}
+    )
 
     def clean(self):
         cleaned_data = super(RegistrationFormTrader, self).clean()
@@ -266,7 +373,7 @@ class RegistrationFormFund(forms.Form):
         required=True,
         max_length=3
     )
-    phone_regex = RegexValidator(regex=r'^\d{10}$',
+    phone_regex = RegexValidator(regex=r'^\d{10,15}$',
                                  message="Phone number must be entered in the format:"
                                          " '+999999999'. Up to 15 digits allowed.")
     second_part_phone_number = forms.CharField(

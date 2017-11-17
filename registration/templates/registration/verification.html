@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html lang="ru">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>Page</title>
-		<link rel="stylesheet" href="css/styles.css">
+		<link rel="stylesheet" media="all" href="{% static 'css/styles.css' %}" >
 	</head>
 	<body>
 		<div class="wrapper bg_style2">
@@ -39,19 +40,21 @@
 					</div>
 				</div>
 			</div>
-			<div class="verification_window">
+			<form class="verification_window" enctype="multipart/form-data" method="post" action="">
+				{% csrf_token %}
 				<div class="verification_title fs32">Регистрация трейдера/фонда</div>
 				<div class="verification_massage fs19">На ваш телефон был отправлен проверочный код,<br> введите его для завершения регистрации</div>
 				<div>
 					<div class="verification_code field-label">Проверочный код:</div>
 					<div class="field">
-						<input type="number">
+						<input class='char_field_code' name="code" type="text">
 					</div>
 					<div>
 						<input class="btn_style btn_size2" type="submit" value="Завершить регистрацию">
 					</div>
 				</div>
-			</div>
+			</form>
+
 		</div>
 	</body>
 </html>

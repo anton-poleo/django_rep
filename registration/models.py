@@ -12,7 +12,6 @@ class Trader(models.Model):
     address = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField()
-    password = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='img', default=None, blank=True)
     link_facebook = models.CharField(max_length=100, default=None)
     link_linkedIn = models.CharField(max_length=100, default=None)
@@ -36,7 +35,6 @@ class Fund(models.Model):
     birthday = models.DateField()
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField()
-    password = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='img', default=None, blank=True)
     # Форматирование гг.мм
     age_of_fund = models.CharField(max_length=100)
@@ -60,3 +58,13 @@ class Investor(models.Model):
     class Meta:
         db_table = "investor"
 
+
+class Access(models.Model):
+
+    class Meta:
+
+        managed = False
+
+        permissions = (
+            ('customer_rights', 'Global customer rights'),
+        )

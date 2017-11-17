@@ -142,12 +142,6 @@
 										</div>
 										<div class="inline-block">
 											<input class="target" name="logo" type="file" hidden id="btn-file1" accept="image/jpg,image/png,image/bmp">
-											<script>
-
-											$(".target").change(function(){
-												alert($("form input[type=file]").val());
-											});
-											</script>
 											<label class="align-bottom btn_style" for="btn-file1">Добавить фото</label>
 										</div>
 										<div class="inline-block align-middle">jpg, png, bmp</div>
@@ -202,7 +196,7 @@
 						</div>
 						<div class="align-center">
 							<div class="input-btn input-btn_set3">
-								<input type="checkbox" id="checkbox1"  checked>
+								<input name="agreement" type="checkbox" id="checkbox1"  checked>
 								<label for="checkbox1"><span></span><i class="fs14">Я принимаю условия <a class="link_style4" href="#">Публичной оферты </a>и даю  платформе Safinum согласие на обработку персональных данных в соответствии с <a class="link_style4" href="#">Политикой конфиденциальности </a>платформы</i></label>
 							</div>
 						</div>
@@ -213,12 +207,7 @@
 					<script type="text/javascript">
         				$( document ).ready(function(){
             				form_handler("tab1", function(data){
-                				$('#tab1').parent().html('<h2>Thank you for the subscription!</h2>');
-                				gtag('event', 'subscribe_main_page', {
-                    				'event_category': 'Subscribe',
-                    				'event_action': 'Subscribe',
-                    				'event_label': 'Mainpage'
-                				});
+            				document.location.href = data.message;
             				});
         				});
         			</script>
@@ -381,7 +370,7 @@
 						</div>
 						<div class="align-center">
 							<div class="input-btn input-btn_set3">
-								<input type="checkbox" id="checkbox2" checked>
+								<input name="agreement"  type="checkbox" id="checkbox2" checked>
 								<label for="checkbox2"><span></span><i class="fs14">Я принимаю условия <a class="link_style4" href="#">Публичной оферты </a>и даю  платформе Safinum согласие на обработку персональных данных в соответствии с <a class="link_style4" href="#">Политикой конфиденциальности </a>платформы</i></label>
 							</div>
 						</div>
@@ -391,13 +380,8 @@
 					</form>
 					<script type="text/javascript">
         				$( document ).ready(function(){
-            				form_handler("tab2", function(data){
-                				$('#tab2').parent().html('<h2>Thank you for the subscription!</h2>');
-                				gtag('event', 'subscribe_main_page', {
-                    				'event_category': 'Subscribe',
-                    				'event_action': 'Subscribe',
-                    				'event_label': 'Mainpage'
-                				});
+            				form_handler("tab1", function(data){
+            				document.location.href = data.message;
             				});
         				});
         			</script>
